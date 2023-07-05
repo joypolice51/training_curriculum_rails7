@@ -2,8 +2,7 @@ class CalendarsController < ApplicationController
 
   # １週間のカレンダーと予定が表示されるページ
   def index
-    getweek
-    @plan = Plan.new
+    get_week
   end
 
   # 予定の保存
@@ -18,7 +17,7 @@ class CalendarsController < ApplicationController
     params.require(:plan).permit(:date, :plan)
   end
 
-  def getweek
+  def get_week
     require 'date'
     wdays = ['(日)','(月)','(火)','(水)','(木)','(金)','(土)']
     
@@ -29,21 +28,21 @@ class CalendarsController < ApplicationController
     @week_days = []
     @todays_date = Date.today
     plans = Plan.where(date: @todays_date..@todays_date + 6)
+    
 
     7.times do |x|
+      @plan = Plan.new
       today_plans = []
       plans.each do |plan|
         today_plans.push(plan.plan) if plan.date == @todays_date + x
       end
 
       wday_num = Date.today.wday + x   #今日の曜日のwdayを呼び出す。timesメソッドのxと連結
-      i = 0
-      wday_num = i     #配列番号を左辺に代入
       if wday_num >= 7
         wday_num = wday_num - 7        
       end
       
-      days = { :month => (@todays_date + x).month, :date => (@todays_date+x).day, :plans => today_plans, :wday => wdays[wday_num]}
+      days = {month:(@todays_date + x).month, date:(@todays_date+x).day, plans:today_plans, wday:wdays[wday_num]}
       @week_days.push(days)
       
     end
